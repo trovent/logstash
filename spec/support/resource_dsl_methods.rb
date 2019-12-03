@@ -45,7 +45,7 @@ module ResourceDSLMethods
         end
 
         it "should include the http address" do
-          pending("flaky test tracked in https://github.com/elastic/logstash/issues/11385")
+          skip("flaky test tracked in https://github.com/elastic/logstash/issues/11385")
           expect(payload["http_address"]).to eql("127.0.0.1:#{::LogStash::WebServer::DEFAULT_PORTS.first}")
         end
 
