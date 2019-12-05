@@ -1,4 +1,4 @@
-package org.logstash;
+package org.logstash.syntax;
 
 public class SyntaxCheck {
 	

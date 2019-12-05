@@ -2,7 +2,7 @@ require 'logstash/compiler/lscl/lscl_grammar'
 
 java_import org.logstash.config.ir.PipelineIR
 java_import org.logstash.config.ir.graph.Graph
-java_import org.logstash.SyntaxCheck
+java_import org.logstash.syntax.SyntaxCheck
 
 module LogStash; class Compiler
   include ::LogStash::Util::Loggable
