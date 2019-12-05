@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jruby.Ruby;
@@ -13,9 +14,7 @@ import org.jruby.RubyInstanceConfig;
 import org.jruby.RubyNumeric;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.builtin.IRubyObject;
-
-import com.google.gson.Gson;
-import static spark.Spark.*;
+import org.logstash.syntax.SyntaxCheckServer;
 
 /**
  * Logstash Main Entrypoint.
@@ -64,23 +63,8 @@ public final class LogstashSyntax implements Runnable, AutoCloseable {
             handleCriticalError(t, null);
         }
         
-        post("/test", (req, res)-> {
-        	res.type("application/json");
-        	
-            String configText = req.body();
-            final IRubyObject compiler = RubyUtil.RUBY.executeScript(
-                "require 'logstash/compiler'\nLogStash::Compiler",
-                ""
-            );
-            final IRubyObject code =
-                    compiler.callMethod(RubyUtil.RUBY.getCurrentContext(), "check_syntax",
-                        new IRubyObject[]{
-                            RubyUtil.RUBY.newString(configText)
-                        }
-                    );
-            SyntaxCheck synCheck = code.toJava(SyntaxCheck.class);
-            return new Gson().toJson(synCheck);
-        });
+        // Instead of exiting, initialize server
+        SyntaxCheckServer.init();
     }
 
     private static void configureNashornDeprecationSwitchForJavaAbove11() {
