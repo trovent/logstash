@@ -6,6 +6,7 @@ import static spark.Spark.notFound;
 import static spark.Spark.path;
 import static spark.Spark.port;
 import static spark.Spark.post;
+import static spark.Spark.get;
 
 import org.jruby.runtime.builtin.IRubyObject;
 import org.logstash.RubyUtil;
@@ -14,10 +15,17 @@ import com.google.gson.Gson;
 
 public class SyntaxCheckServer {
 	
-	public static void init() {
+	private static final int DEFAULT_PORT = 8080;
+	
+	/**
+	 * Starting the server
+	 * 
+	 * @param port Listening port
+	 */
+	public static void start(Integer port) {
 		
 		// Set the server port
-		port(8080);
+		port(port != null ? port : DEFAULT_PORT);
         
 		// Handle not found api
         notFound((req, res) -> {
@@ -41,6 +49,8 @@ public class SyntaxCheckServer {
         // APIs defined under /api path
         path("/api", () -> {
         	
+        	get("/", (req, res) -> "Hello World");
+        	        	
         	// Check syntax API
 	        post("/syntax-check", (req, res)-> {
 	        	String configText = req.body();
@@ -61,6 +71,14 @@ public class SyntaxCheckServer {
 	        });
 	        
         });
+        
+	}
+	
+	/**
+	 * Stopping the server
+	 */
+	public static void stop() {
+		stop();
 	}
 
 }
