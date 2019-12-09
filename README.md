@@ -9,12 +9,16 @@ For more info, see <https://www.elastic.co/products/logstash>
 To check syntax of logstash configuration file within a milliseconds, logstash syntax checker rest server needs to be started with:
 
 ```sh
-bin/logstash-syntax [--port <port>]'
+bin/logstash-syntax [--port <port>]
 ```
 
 If `--port` option is not provided, rest service is listening to 8080 port by default.
 
-curl -X POST http://<host_address>:<port>/api/syntax-check -d 'inputs {stdin { } } output {stdout { } }'
+Example of usage:
+
+```
+curl -X POST http://localhost:8080/api/syntax-check -d 'inputs {stdin { } } output {stdout { } }'
+```
 
 Response is received as:
 
