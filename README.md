@@ -4,6 +4,31 @@ Logstash is part of the [Elastic Stack](https://www.elastic.co/products) along w
 
 For more info, see <https://www.elastic.co/products/logstash>
 
+## Syntax Checker
+
+To check syntax of logstash configuration file within a milliseconds, logstash syntax checker rest server needs to be started with:
+
+```sh
+bin/logstash-syntax [--port <port>]
+```
+
+If `--port` option is not provided, rest service is listening to 8080 port by default.
+
+Example of usage:
+
+```
+curl -X POST http://localhost:8080/api/syntax-check -d 'inputs {stdin { } } output {stdout { } }'
+```
+
+Response is received as:
+
+```
+{
+    "isOk": false, # true if syntax is ok
+    "error": "Expected one of [ \\t\\r\\n], \"#\", \"{\" at line 1, column 6 (byte 6) after input" # null if syntax is ok
+}
+```
+
 ## Documentation and Getting Started
 
 You can find the documentation and getting started guides for Logstash
