@@ -9,7 +9,7 @@ kill_process () {
 PORT=4567
 
 echo -n "Starting logstash syntax checker server"
-./bin/logstash-syntax --port $PORT &> /dev/null &
+./bin/logstash-syntax -f pipeline -t --port $PORT &> /dev/null &
 
 pid=$!
 

@@ -5,7 +5,14 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jruby.Ruby;
@@ -15,7 +22,6 @@ import org.jruby.RubyNumeric;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.logstash.syntax.SyntaxCheckServer;
-import org.apache.commons.cli.*;
 
 /**
  * Logstash Main Entrypoint.
@@ -35,9 +41,17 @@ public final class LogstashSyntax implements Runnable, AutoCloseable {
      * @param args Logstash CLI Arguments
      */
     public static void main(final String... args) {
-    	Integer port = getPort(args);
-
-    	String[] args2 = {"-e", "input { stdin { } } output { stdout {} }", "-t"};
+    	
+    	// get port for ssh syntax check service
+    	String[] additionalArgs = Arrays.copyOfRange(args, args.length-2, args.length);
+    	Integer port = getPort(additionalArgs);
+    	if (port == null) {
+    		throw new IllegalArgumentException("port parameter missing");
+    	}
+    	
+    	// get basic logstash arguments
+    	String[] logstashArgs = Arrays.copyOf(args, args.length-2);
+    	
         final String lsHome = System.getenv("LS_HOME");
         if (lsHome == null) {
             throw new IllegalStateException(
@@ -48,7 +62,7 @@ public final class LogstashSyntax implements Runnable, AutoCloseable {
 
         final Path home = Paths.get(lsHome).toAbsolutePath();
         try (
-                final LogstashSyntax logstash = new LogstashSyntax(home, args2, System.out, System.err, System.in)
+                final LogstashSyntax logstash = new LogstashSyntax(home, logstashArgs, System.out, System.err, System.in)
         ) {
             logstash.run();
         } catch (final IllegalStateException e) {
@@ -88,26 +102,6 @@ public final class LogstashSyntax implements Runnable, AutoCloseable {
             }
         }
         System.exit(1);
-    }
-    
-    private static Integer getPort(String[] args) {
-    	Integer port = null;
-    	
-    	Options options = new Options();
-        Option input = new Option("p", "port", true, "listening port");
-        options.addOption(input);
-        
-        CommandLineParser parser = new DefaultParser();
-        CommandLine cmd;
-
-        try {
-            cmd = parser.parse(options, args);
-            port = Integer.parseInt(cmd.getOptionValue("port"));
-        } catch (ParseException | NumberFormatException e) {
-            port = null;
-        }
-        
-        return port;
     }
 
     /**
@@ -200,5 +194,25 @@ public final class LogstashSyntax implements Runnable, AutoCloseable {
 
     private static void uncleanShutdown(final Exception ex) {
         throw new IllegalStateException("Logstash stopped processing because of an error: " + ex.getMessage(), ex);
+    }
+    
+    private static Integer getPort(String[] args) {
+    	Integer port = null;
+
+    	Options options = new Options();
+        Option input = new Option("p", "port", true, "listening port");
+        options.addOption(input);
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd;
+
+        try {
+            cmd = parser.parse(options, args);
+            port = Integer.parseInt(cmd.getOptionValue("port"));
+        } catch (ParseException | NumberFormatException e) {
+            port = null;
+        }
+
+        return port;
     }
 }
