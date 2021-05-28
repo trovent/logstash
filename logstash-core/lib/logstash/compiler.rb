@@ -17,6 +17,10 @@
 
 require 'logstash/compiler/lscl/lscl_grammar'
 
+java_import org.logstash.config.ir.PipelineIR
+java_import org.logstash.config.ir.graph.Graph
+java_import org.logstash.SyntaxCheck
+
 module LogStash; class Compiler
   include ::LogStash::Util::Loggable
 
@@ -35,4 +39,19 @@ module LogStash; class Compiler
     config.process_escape_sequences = support_escapes
     config.compile(source_with_metadata)
   end
+
+  def self.compile_graph(source_with_metadata, support_escapes)
+    Hash[compile_imperative(source_with_metadata, support_escapes).map {|section,icompiled| [section, icompiled.toGraph]}]
+  end
+  
+  def self.check_syntax(my_config)
+    grammar = LogStashCompilerLSCLGrammarParser.new
+    config_output = grammar.parse(my_config)
+    
+    if config_output.nil?
+      return SyntaxCheck.new(grammar.failure_reason)
+    end
+    return SyntaxCheck.new()
+  end
+  
 end; end
