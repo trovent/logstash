@@ -31,6 +31,9 @@ String jacksonVersion = versionMap['jackson']
 String jacksonDatabindVersion = versionMap['jackson-databind']
 
 String log4jVersion = '2.17.1'
+String sparkCoreVersion = '2.9.4'
+String gsonVersion = '2.11.0'
+String commonsCliVersion = '1.9.0'
 
 repositories {
     mavenCentral()
@@ -155,6 +158,10 @@ def customJRubyDir = project.hasProperty("custom.jruby.path") ? project.property
 def customJRubyVersion = customJRubyDir == "" ? "" : Files.readAllLines(Paths.get(customJRubyDir, "VERSION")).get(0).trim()
 
 dependencies {
+    implementation "com.sparkjava:spark-core:${sparkCoreVersion}"
+    implementation "com.google.code.gson:gson:${gsonVersion}"
+    implementation "commons-cli:commons-cli:${commonsCliVersion}"
+
     implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
     annotationProcessor "org.apache.logging.log4j:log4j-core:${log4jVersion}"
     api "org.apache.logging.log4j:log4j-core:${log4jVersion}"

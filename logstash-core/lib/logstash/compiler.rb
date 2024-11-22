@@ -17,6 +17,8 @@
 
 require 'logstash/compiler/lscl/lscl_grammar'
 
+java_import org.logstash.syntax.SyntaxCheck
+
 module LogStash; class Compiler
   include ::LogStash::Util::Loggable
 
@@ -35,4 +37,15 @@ module LogStash; class Compiler
     config.process_escape_sequences = support_escapes
     config.compile(source_with_metadata)
   end
+
+  def self.check_syntax(my_config)
+    grammar = LogStashCompilerLSCLGrammarParser.new
+    config_output = grammar.parse(my_config)
+
+    if config_output.nil?
+      return SyntaxCheck.new(grammar.failure_reason)
+    end
+    return SyntaxCheck.new()
+  end
+
 end; end

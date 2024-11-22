@@ -19,6 +19,10 @@
 
 description = """Logstash Integration Tests"""
 
+String restAssuredVersion = '5.5.0'
+String hamcrestVersion =  '3.0'
+String commonsIoVersion = '2.18.0'
+
 repositories {
   mavenCentral()
 }
@@ -30,6 +34,10 @@ buildscript {
 }
 
 dependencies {
+  testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
+  testImplementation "org.hamcrest:hamcrest:${hamcrestVersion}"
+  testImplementation "commons-io:commons-io:${commonsIoVersion}"
+
   testImplementation project(':logstash-core')
   testImplementation 'org.assertj:assertj-core:3.8.0'
   testImplementation 'junit:junit:4.12'
@@ -81,4 +89,8 @@ tasks.register("integrationTests", Test) {
       return true
     }
   }
+}
+
+tasks.register("syntaxTests", Test) {
+  include '/org/logstash/integration/SyntaxCheckTests.class'
 }
